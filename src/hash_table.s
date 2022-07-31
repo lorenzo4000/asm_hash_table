@@ -286,8 +286,8 @@ hash_table_insert:
 	push %rdx
 	
 	call hash_table_find
-	andq %rax, %rax
-	jnz hash_table_insert_exit # if exists just return
+	cmpq $0, %rax
+	jge hash_table_insert_exit # if exists just return
 
 
 	movq %r9, %rdi
@@ -381,7 +381,7 @@ hash_table_insert:
 	jmp hash_table_insert_exit
 
 	hash_table_insert_type_error:
-		movq $0, %rax
+		movq $-1, %rax
 		jmp hash_table_insert_exit
 	
 	hash_table_insert_resize:
@@ -412,7 +412,7 @@ hash_table_insert:
 	pop %rbp
 	ret
 
-# rdi, rsi: key; rdx: hash_table_struct pointer -- rax: reference to data in table
+# rdi, rsi: key; rdx: hash_table_struct pointer -- rax: index of data in table / -1 if ERROR
 hash_table_find:
 	push %rbp
 	push %rbx
@@ -545,9 +545,11 @@ hash_table_find:
 	# get table entry address
 	movq %r14, %rax
 	
+	/*
 	mulq %r9			# index * size of entry
 	addq 24(%r8), %rax	# ... + start of table in memory
 	addq   (%r8), %rax	# ... + size of metadata in table
+	*/
 
 	jmp hash_table_find_exit
 
@@ -556,7 +558,7 @@ hash_table_find:
 		jmp hash_table_find_exit
 	
 	hash_table_find_no_match:
-		xorq %rax, %rax
+		movq $-1, %rax
 
 	hash_table_find_exit:
 	movq %rbp, %rsp

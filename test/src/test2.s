@@ -22,8 +22,15 @@
 		movq %rsp, %rcx
 		leaq 28(%rsp), %r8
 		call hash_map_insert
-
 		
+		andq %rax, %rax
+		jz 0
+
+		xorq %rax, %rax
+		movq $8, %rdi
+		leaq 20(%rsp), %rsi
+		leaq 28(%rsp), %rdx
+		call hash_map_find
 
 		andq %rax, %rax
 		jz 0
