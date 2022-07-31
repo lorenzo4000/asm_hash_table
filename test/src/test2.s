@@ -4,18 +4,29 @@
 	_start:
 		push %rbp
 		movq %rsp, %rbp
-		subq $(SIZE_OF_HASH_MAP_STRUCT + 8), %rsp
+		subq $(SIZE_OF_HASH_MAP_STRUCT + 8 + 20), %rsp
 
-		movq $2, %rdi
+		movq $0x1000, %rdi
 		movq $8, %rsi
 		movq $20, %rdx
-		leaq 8(%rsp), %rcx
+		leaq 28(%rsp), %rcx
 		call new_hash_map
 		cmpq $0, %rax
 		jl _exit
 
-		movq %rdx, %rdi
-		call delete_hash_map
+		movq $0, 20(%rsp)
+		movq $69, (%rsp)
+		movq $8, %rdi
+		leaq 20(%rsp), %rsi
+		movq $20, %rdx
+		movq %rsp, %rcx
+		leaq 28(%rsp), %r8
+		call hash_map_insert
+
+		
+
+		andq %rax, %rax
+		jz 0
 
 		/*
 		movw $0, (%rsp)

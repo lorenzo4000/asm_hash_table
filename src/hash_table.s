@@ -264,7 +264,7 @@ hash_table_group_status:
 
 	ret
 
-# rdi, rsi: key; rdx: hash_table_struct pointer -- rax: reference to new entry / 0 if error
+# rdi, rsi: key; rdx: hash_table_struct pointer -- rax: index of new entry / 0 if error
 hash_table_insert:
 	push %rbp
 	push %rbx
@@ -350,8 +350,9 @@ hash_table_insert:
 		jmp hash_table_insert_groups_loop
 	
 	hash_table_insert_insert:
-	# get table entry address
+	# get table entry index
 	movq %r13, %rax
+	push %rax
 	
 	#
 	# metadata
@@ -376,6 +377,7 @@ hash_table_insert:
 	movq %r10, %rsi
 	rep movsb
 
+	pop %rax
 	jmp hash_table_insert_exit
 
 	hash_table_insert_type_error:
@@ -413,6 +415,11 @@ hash_table_insert:
 # rdi, rsi: key; rdx: hash_table_struct pointer -- rax: reference to data in table
 hash_table_find:
 	push %rbp
+	push %rbx
+	push %r12
+	push %r13
+	push %r14
+	push %r15
 	movq %rsp, %rbp
 	xorq %rax, %rax
 	# check the size of the key.
@@ -553,6 +560,11 @@ hash_table_find:
 
 	hash_table_find_exit:
 	movq %rbp, %rsp
+	pop %r15
+	pop %r14
+	pop %r13
+	pop %r12
+	pop %rbx
 	pop %rbp
 	ret
 
