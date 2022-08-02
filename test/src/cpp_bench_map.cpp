@@ -4,7 +4,7 @@
 #include <cstdlib>
 #include <chrono>
 
-#define N 0x10
+#define N 0x100000
 
 typedef std::chrono::high_resolution_clock Clock;
 using std::chrono::duration_cast;

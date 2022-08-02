@@ -3,7 +3,10 @@
 .global hash_table_resize
 .global hash_table_insert
 .global hash_table_find
+.global hash_table_at
+.global hash_table_group_status
 .global SIZE_OF_HASH_TABLE_STRUCT
+.global HASH_TABLE_GROUP_SIZE
 
 /*
 	hash_table_struct:
@@ -264,7 +267,7 @@ hash_table_group_status:
 
 	ret
 
-# rdi, rsi: key; rdx: hash_table_struct pointer -- rax: index of new entry / 0 if error
+# rdi, rsi: key; rdx: hash_table_struct pointer -- rax: index of new entry / -1 if type error / -2 if size error (needs resize)
 hash_table_insert:
 	push %rbp
 	push %rbx
@@ -385,23 +388,8 @@ hash_table_insert:
 		jmp hash_table_insert_exit
 	
 	hash_table_insert_resize:
-		# size * 64
-		movq (%r8), %rsi		
-		shlq $6, %rsi
-		movq %r8, %rdi
-		push %r8
-		push %r9
-		push %r10
-		call hash_table_resize		
-		pop %r10
-		pop %r9
-		pop %r8
-		
-		# recurse	
-		movq %r8, %rdx
-		movq %r9, %rdi
-		movq %r10, %rsi
-		call hash_table_insert		
+		movq $-2, %rax
+		jmp hash_table_insert_exit
 	hash_table_insert_exit:
 	movq %rbp, %rsp
 	pop %r15

@@ -6,7 +6,7 @@
 		movq %rsp, %rbp
 		subq $(SIZE_OF_HASH_MAP_STRUCT + 8 + 20), %rsp
 
-		movq $0x1000, %rdi
+		movq $0x8, %rdi
 		movq $8, %rsi
 		movq $20, %rdx
 		leaq 28(%rsp), %rcx
@@ -35,6 +35,21 @@
 		andq %rax, %rax
 		jz 0
 
+		movq $1024, %rsi
+		leaq 28(%rsp), %rdi
+		call hash_map_resize
+		
+		cmpq $0, %rax
+		jl 0
+		
+		xorq %rax, %rax
+		movq $8, %rdi
+		leaq 20(%rsp), %rsi
+		leaq 28(%rsp), %rdx
+		call hash_map_find
+		
+		andq %rax, %rax
+		jz 0
 		/*
 		movw $0, (%rsp)
 		test_loop:
